@@ -2,6 +2,7 @@ package main
 
 import(
   "net/http"
+  "net"
   "database/sql"
   _ "github.com/lib/pq"
   "log"
@@ -10,6 +11,8 @@ import(
 func main(){
   //credentials hardcoded but don't worry there is no public access
   db,_:= sql.Open("postgres", "host=ctolearn.cluster-ro-cjincqaxcmb8.us-east-1.rds.amazonaws.com port=5432 user=postgres password=hdAXa4yVe7HWRXb dbname=postgres sslmode=disable")
+  conn,_ := net.Dial("ip:icmp","google.com")
+  myIP:=conn.LocalAddr().String()
   http.HandleFunc("/",func(res http.ResponseWriter, req *http.Request){
     row:=db.QueryRow("SELECT version(),NOW()")
     version :=""
@@ -18,7 +21,7 @@ func main(){
     if err != nil{
       log.Printf(err.Error())
     }
-    res.Write([]byte(version+" "+now))
+    res.Write([]byte(myIP+"\n"+version+" "+now))
   })
   http.ListenAndServe(":8081", nil)
 }
